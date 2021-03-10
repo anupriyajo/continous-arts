@@ -12,8 +12,7 @@ async def download_image(image_url: str, session: aiohttp.ClientSession) -> str:
         img_file = await aiofiles.open(file_name, mode="wb")
         await img_file.write(await response.read())
         await img_file.close()
-
-    return file_name
+        return file_name
 
 
 async def read_file(file_name: str) -> List[str]:
@@ -23,10 +22,11 @@ async def read_file(file_name: str) -> List[str]:
 
 async def main():
     urls = await read_file("images.json")
+    tasks = []
     async with aiohttp.ClientSession() as session:
         for url in urls:
-            await download_image(url, session)
-
+            tasks.append(asyncio.ensure_future(download_image(url, session)))
+        await asyncio.gather(*tasks)
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
