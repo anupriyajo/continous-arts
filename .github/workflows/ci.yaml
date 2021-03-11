@@ -1,0 +1,29 @@
+name: Read images
+on:
+  - push
+
+jobs:
+  recognise:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: install dependencies
+        run: pip install -r requirements.txt
+
+      - name: extract text
+        run: python main.py
+
+      - name: collect text
+        uses: actions/upload-artifact@v2
+        with:
+          name: recognitions
+          path: |
+            output
