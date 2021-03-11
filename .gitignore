@@ -130,6 +130,4 @@ dmypy.json
 
 .idea/
 *.iml
-*.png
-*.jpg
-*.jpeg
+output/
