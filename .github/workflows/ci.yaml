@@ -18,15 +18,8 @@ jobs:
       - name: install dependencies
         run: pip install -r requirements.txt
 
-      - name: install tesseract
-        run: sudo apt update && sudo apt install -y tesseract-ocr
-
       - name: extract text
+        env:
+          AWS_ACCESS_ID: ${{ secrets.AWS_ACCESS_ID }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
         run: python main.py
-
-      - name: collect text
-        uses: actions/upload-artifact@v2
-        with:
-          name: recognitions
-          path: |
-            output

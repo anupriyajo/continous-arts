@@ -1,50 +1,68 @@
-import asyncio
+import boto3
 import json
+import urllib
 import os
-from typing import List
+from spellchecker import SpellChecker
 
-import aiofiles
-import aiohttp
-import cv2
-import pytesseract
+spell = SpellChecker()
 
+ACCESS_ID = os.environ.get("AWS_ACCESS_ID")
+SECRET_KEY = os.environ.get("AWS_SECRET_KEY")
+REGION_NAME = "us-west-2"
 
-def read_image(path: str) -> str:
-    img = cv2.imread(path)
-    custom_config = r'--oem 3 --psm 6'
-    return pytesseract.image_to_string(img, config=custom_config)
-
-
-async def download_image(image_url: str, session: aiohttp.ClientSession, path: str) -> str:
-    file_name = os.path.join(path, image_url.split("/")[-1])
-    async with session.get(image_url) as response:
-        img_file = await aiofiles.open(file_name, mode="wb")
-        await img_file.write(await response.read())
-        await img_file.close()
-        return file_name
+# Amazon Textract client
+textract = boto3.client('textract', aws_access_key_id=ACCESS_ID, aws_secret_access_key=SECRET_KEY,
+                        region_name=REGION_NAME)
 
 
-async def read_file(file_name: str) -> List[str]:
-    async with aiofiles.open(file_name) as urls:
-        return json.loads(await urls.read()).get("urls")
+def read_file(f):
+    with open(f) as json_file:
+        data = json.load(json_file)
+    return (data['urls'])
 
 
-async def main(path: str):
-    urls = await read_file("images.json")
-    tasks = []
-    async with aiohttp.ClientSession() as session:
-        for url in urls:
-            tasks.append(asyncio.ensure_future(download_image(url, session, path)))
-        await asyncio.gather(*tasks)
-    files = map(lambda file_path: os.path.join(path, file_path), os.listdir(path))
-    extracted_text = map(read_image, files)
-    with open(os.path.join("output", "extracted.json"), "w") as out:
-        out.write(json.dumps(list(extracted_text), indent=2))
+def download_file(url):
+    file_name = url.split("/")[-1]
+    urllib.request.urlretrieve(url, file_name)
+    return file_name
+
+
+def check_spelling(word):
+    misspelled = spell.unknown([word])
+    if len(misspelled) > 0:
+        return spell.correction(word)
+    else:
+        return (word)
+
+
+def run_textract(im):
+    documentText = ""
+    found_words = []
+    with open(im, 'rb') as document:
+        imageBytes = bytearray(document.read())
+    response = textract.detect_document_text(Document={'Bytes': imageBytes})
+    for item in response["Blocks"]:
+        if item["BlockType"] == "LINE":
+            documentText = documentText + item["Text"]
+            phrase = item["Text"].split()
+            for p in phrase:
+                found_words.append(p)
+    return found_words
+
+
+def spellCheck(words):
+    corrected_text = []
+    for fw in words:
+        corr = check_spelling(fw)
+        if check_spelling(fw) != 'none':
+            corrected_text.append(corr)
+    return (corrected_text)
 
 
 if __name__ == '__main__':
-    output = "output"
-    if not os.path.exists(output):
-        os.mkdir(output)
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(output))
+    urls = read_file("images.json")
+    for url in urls:
+        im = download_file(url)
+        words = run_textract(im)
+        corrected = spellCheck(words)
+        print(corrected)
