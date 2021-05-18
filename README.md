@@ -1,4 +1,4 @@
-# Continuous-Arts
+# Continuous-Arts Example
 
 
 This is a simple project demoing the use of a [CI](https://en.wikipedia.org/wiki/Continuous_integration) tool and a machine learning program.
