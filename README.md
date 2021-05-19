@@ -1,7 +1,7 @@
 # Continuous-Arts Example
 
 
-This is a simple project demoing the use of a [CI](https://en.wikipedia.org/wiki/Continuous_integration) tool and a machine learning program.
+This is an example repo to demonstrate the use of a [Continuous Integration](https://en.wikipedia.org/wiki/Continuous_integration) toolkit based on a machine learning program, as described in James Coupe's article [A Continuous Integration Toolkit for Artists](https://thoughtworksarts.io/blog/continuous-integration-toolkit-for-artists/).
 
 ### The program
 - Given a list of image URLs: `images.json`.
