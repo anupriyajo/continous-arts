@@ -9,7 +9,7 @@ to check and verify the results.
 
 ### Running locally
 
-A Linux or MacOS is assumed.
+A Linux or MacOS is assumed. See [this](https://www.liquidweb.com/kb/how-to-setup-a-python-virtual-environment-on-windows-10/) to setup a python virtual env in windows.
 
 - Make sure [Python](https://www.python.org/downloads/) 3.7+ is installed
 - Create a directory `~/.virtualenvs`
@@ -23,8 +23,9 @@ A Linux or MacOS is assumed.
 - Customize the urls in the `images.json` to affect the images being downloaded
 
 ### Seeing the CI Runs
-This project uses GitHub [Actions](https://github.com/features/actions) as the CI and it used pre-configured AWS credentials to connect to AWS and perform the OCR.
 
-The status of the last pipeline runs can be viewed [here](https://github.com/thoughtworksarts/continuous-arts/actions)
+This project uses GitHub [Actions](https://github.com/features/actions) as the CI and it uses pre-configured AWS credentials as actions [secrets](https://docs.github.com/en/actions/reference/encrypted-secrets) to connect to AWS and perform the OCR.
+
+The status of the last pipeline runs can be viewed [here](https://github.com/thoughtworksarts/continuous-arts/actions). You can expand the pipeline stage called `extract text` and view the outcome of the OCR.
 
 To execute the runs on your own, you can fork this repo and you would get your own copy of the pipeline and can set your own AWS variables and should be triggered via pushing more commit to your repo.
