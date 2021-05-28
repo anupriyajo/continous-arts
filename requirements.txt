@@ -1,2 +1,3 @@
 boto3>=1.17.51
 pyspellchecker>=0.6.2
+requests>=2.25.1

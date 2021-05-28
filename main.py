@@ -3,10 +3,10 @@
 # pylint: disable=missing-function-docstring
 
 import json
-import urllib
 import os
 
 import boto3
+import requests
 from spellchecker import SpellChecker
 
 spell = SpellChecker()
@@ -33,7 +33,10 @@ def read_file(path):
 
 def download_file(file_url):
     file_name = file_url.split("/")[-1]
-    urllib.request.urlretrieve(file_url, file_name)
+    img = requests.get(file_url)
+
+    with open(file_name, "wb") as img_file:
+        img_file.write(img.content)
 
     return file_name
 
